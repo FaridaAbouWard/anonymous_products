@@ -14,7 +14,7 @@ app.use(bodyParser.json())
 app.get('/api/products', async (req, res) => {
   const db = await mongoClient();
   const results = await db.collection('products').find().toArray()
-  res.status(200).send({ body: results, message: 'Successfully retrieved search results' });
+  res.status(200).send({ body: results, message: 'Successfully displayed all products' });
   //return res.send(`Mongo URL: ${process.env.MONGO_URI}`);
 });
 
