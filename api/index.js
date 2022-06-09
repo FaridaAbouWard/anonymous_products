@@ -2,54 +2,60 @@ require("dotenv").config();
 const express = require("express");
 const bodyParser = require('body-parser');
 const { mongoClient } = require('./mongo');
+// import express from 'express';
+// import bodyParser from 'body-parser';
+
 
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-app.get('/api/shipments/test', (req, res) => {
-  return res.send(`Mongo URL: ${process.env.MONGO_URI}`);
+app.get('/api/products', async (req, res) => {
+  const db = await mongoClient();
+  const results = await db.collection('products').find().toArray()
+  res.status(200).send({ body: results, message: 'Successfully retrieved search results' });
+  //return res.send(`Mongo URL: ${process.env.MONGO_URI}`);
 });
 
-app.get('/api/find/:search', async (req, res) => {
+app.get('/api/products/find/:search', async (req, res) => {
   const db = await mongoClient();
   if (!db) res.status(500).send('Systems Unavailable');
 
   const { search } = req.params;
-  const results = await db.collection('shipments').find({ "order_id": { $regex: search, $options: "i" } }).toArray();
+  const results = await db.collection('products').find({ "name": { $regex: search, $options: "i" } }).toArray();
   res.status(200).send({ body: results, message: 'Successfully retrieved search results' });
 });
 
-app.get('/api/shipments/:order_id', async (req, res) => {
-  const db = await mongoClient();
-  if (!db) res.status(500).send('Systems Unavailable');
+// app.get('/api/shipments/:order_id', async (req, res) => {
+//   const db = await mongoClient();
+//   if (!db) res.status(500).send('Systems Unavailable');
 
-  const shipment = await db.collection('shipments').findOne({ order_id: req.params.order_id });
-  res.status(200).send({ body: shipment, message: 'Successfully retrieved shipment' });
-});
+//   const shipment = await db.collection('shipments').findOne({ order_id: req.params.order_id });
+//   res.status(200).send({ body: shipment, message: 'Successfully retrieved shipment' });
+// });
 
-app.post('/api/shipments', async (req, res) => {
-  try {
-    const db = await mongoClient();
-    if (!db) res.status(500).send('Systems Unavailable');
+// app.post('/api/shipments', async (req, res) => {
+//   try {
+//     const db = await mongoClient();
+//     if (!db) res.status(500).send('Systems Unavailable');
     
-    console.log('[createShipment body]', req.body)
-    const { order_id } = req.body;
-    if (!order_id) return res.status(403).send('order_id is required');
+//     console.log('[createShipment body]', req.body)
+//     const { order_id } = req.body;
+//     if (!order_id) return res.status(403).send('order_id is required');
 
-    const shipment = await db.collection('shipments').findOne({ order_id });
-    if (shipment) return res.status(403).send('Document already exists, cannot create');
+//     const shipment = await db.collection('shipments').findOne({ order_id });
+//     if (shipment) return res.status(403).send('Document already exists, cannot create');
 
-    const shipmentStatus = 'CREATED';
+//     const shipmentStatus = 'CREATED';
 
-    const newShipmentDocument = await db.collection('shipments').insertOne({ order_id, shipment_status: shipmentStatus });
-    return res.status(200).send({ body: newShipmentDocument, message: 'Successfully created shipment' });
-  }
-  catch (e) {
-    console.log('[createShipment] e', e)
-  }
-});
+//     const newShipmentDocument = await db.collection('shipments').insertOne({ order_id, shipment_status: shipmentStatus });
+//     return res.status(200).send({ body: newShipmentDocument, message: 'Successfully created shipment' });
+//   }
+//   catch (e) {
+//     console.log('[createShipment] e', e)
+//   }
+// });
 
 // app.patch('/api/shipments', async (req, res) => {
 //   try {
@@ -101,7 +107,7 @@ app.post('/api/shipments', async (req, res) => {
 //   }
 // });
 
-app.listen(process.env.PORT || 5000, async () => {
+app.listen(process.env.PORT || 9000, async () => {
   console.log("The server is running on")
   // await connectDB();
 });
