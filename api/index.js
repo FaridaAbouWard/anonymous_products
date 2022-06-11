@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const bodyParser = require('body-parser');
 const { mongoClient } = require('./mongo');
+const { Router } = require("express");
 // import express from 'express';
 // import bodyParser from 'body-parser';
 
@@ -26,14 +27,33 @@ app.get('/api/products/:search', async (req, res) => {
   const results = await db.collection('products').find({ "name": { $regex: search, $options: "i" } }).toArray();
   res.status(200).send(results);
 });
-app.get('/api/products/:search', async (req, res) => {
-  const db = await mongoClient();
-  if (!db) res.status(500).send('Systems Unavailable');
+app.get("/:slug", async function(req, res, next) {
+  client.connect(uri, async (err, dbclient) => {
+      if (err) throw err
+      const db = await mongoClient
+      db.collection('products').findOne({"id": req.params.slug}, (err, result) => {
+          if (err) throw err
 
-  const { search } = req.params;
-  const results = await db.collection('products').findOne({ "_id":search}).toArray();
-  res.status(200).send(results);
+          res.send(result)
+      })
+  })
 });
+
+
+
+
+
+
+
+// app.get('/:slug', async (req, res,next) => {
+
+//   const db = await mongoClient();
+//   if (!db) res.status(500).send('Systems Unavailable');
+
+//   const { search } = req.params;
+//   const results = await db.collection('products').findOne({ "_id":search}).toArray();
+//   res.status(200).send(results);
+// });
 // app.get('/api/shipments/:order_id', async (req, res) => {
 //   const db = await mongoClient();
 //   if (!db) res.status(500).send('Systems Unavailable');
