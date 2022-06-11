@@ -19,25 +19,33 @@ app.get('/api/products', async (req, res) => {
   //return res.send(`Mongo URL: ${process.env.MONGO_URI}`);
 });
 
-app.get('/api/products/:search', async (req, res) => {
+// app.get('/api/products/:search', async (req, res) => {
+//   const db = await mongoClient();
+//   if (!db) res.status(500).send('Systems Unavailable');
+
+//   const { search } = req.params;
+//   const results = await db.collection('products').find({ "name": { $regex: search, $options: "i" } }).toArray();
+//   res.status(200).send(results);
+// });
+app.get('/api/products/:id', async (req,res) => {
   const db = await mongoClient();
-  if (!db) res.status(500).send('Systems Unavailable');
-
-  const { search } = req.params;
-  const results = await db.collection('products').find({ "name": { $regex: search, $options: "i" } }).toArray();
-  res.status(200).send(results);
+  const results = await db.collection('products').find().toArray();
+  const product = results.filter(({ id }) => req.params.id === id);
+  return res.json(product);
 });
-app.get("/:slug", async function(req, res, next) {
-  client.connect(uri, async (err, dbclient) => {
-      if (err) throw err
-      const db = await mongoClient
-      db.collection('products').findOne({"id": req.params.slug}, (err, result) => {
-          if (err) throw err
 
-          res.send(result)
-      })
-  })
-});
+
+
+// app.get("/api/products/:slug", async function(req, res, next) {
+//   client.connect(MONGO_URI, async (err, mongoClient) => {
+//       if (err) throw err
+//       const db = await mongoClient
+//       db.collection('products').findOne({"_id": req.params.slug}, (err, result) => {
+//           if (err) throw err
+//           res.send(result)
+//       })
+//   })
+// });
 
 
 

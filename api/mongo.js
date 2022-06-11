@@ -11,7 +11,7 @@ let dbConnection;
 const connect = async () => {
   try {
     const client = await MongoClient.connect(MONGO_URI);
-    dbConnection = client.db(MONGO_DB_NAME);
+    dbConnection = client.db(MONGO_DB_NAME)
   } catch (e) {
     throw new Error(`Could not establish database connection: ${e}`);
   }
@@ -27,3 +27,4 @@ const mongoClient = async () => {
 module.exports = {
   mongoClient,
 };
+
