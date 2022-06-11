@@ -26,7 +26,14 @@ app.get('/api/products/:search', async (req, res) => {
   const results = await db.collection('products').find({ "name": { $regex: search, $options: "i" } }).toArray();
   res.status(200).send(results);
 });
+app.get('/api/products/:search', async (req, res) => {
+  const db = await mongoClient();
+  if (!db) res.status(500).send('Systems Unavailable');
 
+  const { search } = req.params;
+  const results = await db.collection('products').findOne({ "_id":search}).toArray();
+  res.status(200).send(results);
+});
 // app.get('/api/shipments/:order_id', async (req, res) => {
 //   const db = await mongoClient();
 //   if (!db) res.status(500).send('Systems Unavailable');
