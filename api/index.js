@@ -18,7 +18,7 @@ app.get('/api/products', async (req, res) => {
   //return res.send(`Mongo URL: ${process.env.MONGO_URI}`);
 });
 
-app.get('/api/products/find/:search', async (req, res) => {
+app.get('/api/products/:search', async (req, res) => {
   const db = await mongoClient();
   if (!db) res.status(500).send('Systems Unavailable');
 
