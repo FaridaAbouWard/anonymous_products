@@ -31,7 +31,7 @@ app.get('/api/products/:id', async (req,res) => {
   const db = await mongoClient();
   const results = await db.collection('products').find().toArray();
   const product = results.filter(({ id }) => req.params.id === id);
-  return res.json(product);
+  return res.json(product.length ? product.shift() : product);;
 });
 
 
